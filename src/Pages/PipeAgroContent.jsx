@@ -9,53 +9,53 @@ const PipeAgroContent = () => {
   const [previousSlide, setPreviousSlide] = useState(0);
   const [animating, setAnimating] = useState(false);
   const [direction, setDirection] = useState('next');
-  
+
   const slides = [
-    { 
-      id: 1, 
+    {
+      id: 1,
       theme: "PIPE Agro 1",
-      title: "titulo 1", 
-      subtitle: "SUBTITULO 1", 
+      title: "titulo 1",
+      subtitle: "SUBTITULO 1",
       description: "Aqui vai apareçer uma descrição mais longa e detalhada sobre o destino, incluindo informações sobre cultura, clima e atividades disponíveis.",
-      bgImage: image1 
+      bgImage: image1
     },
-    { 
-      id: 2, 
+    {
+      id: 2,
       theme: "PIPE Agro 2",
-      title: "titulo 2", 
-      subtitle: "SUBTITULO 2", 
+      title: "titulo 2",
+      subtitle: "SUBTITULO 2",
       description: "Aqui vai apareçer uma descrição mais longa e detalhada sobre o destino, incluindo informações sobre cultura, clima e atividades disponíveis.",
-      bgImage: image2 
+      bgImage: image2
     },
-    { 
-      id: 3, 
+    {
+      id: 3,
       theme: "PIPE Agro 3",
-      title: "titulo 3", 
-      subtitle: "SUBTITULO 3", 
+      title: "titulo 3",
+      subtitle: "SUBTITULO 3",
       description: "Aqui vai apareçer uma descrição mais longa e detalhada sobre o destino, incluindo informações sobre cultura, clima e atividades disponíveis.",
-      bgImage: image3 
+      bgImage: image3
     }
   ];
-  
+
   const handleSlideChange = (index) => {
     if (animating || index === activeSlide) return;
-    
+
     setAnimating(true);
     setDirection(index > activeSlide ? 'next' : 'prev');
     setPreviousSlide(activeSlide);
     setActiveSlide(index);
-    
+
     setTimeout(() => setAnimating(false), 1000);
   };
-  
+
   const goToNextSlide = () => {
     handleSlideChange((activeSlide + 1) % slides.length);
   };
-  
+
   const goToPrevSlide = () => {
     handleSlideChange((activeSlide - 1 + slides.length) % slides.length);
   };
-  
+
   useEffect(() => {
     // Auto-rotate slides
     const interval = setInterval(() => {
@@ -63,35 +63,34 @@ const PipeAgroContent = () => {
         goToNextSlide();
       }
     }, 8000);
-    
+
     return () => clearInterval(interval);
   }, [activeSlide, animating]);
-  
+
   return (
     <div className="relative h-screen w-full overflow-hidden">
       {/* Background Images com Transições Aprimoradas */}
       {slides.map((slide, index) => (
-        <div 
+        <div
           key={slide.id}
-          className={`absolute inset-0 w-full h-full transition-all duration-1500 ease-in-out bg-cover bg-center ${
-            index === activeSlide 
-              ? 'opacity-100 scale-100 z-10' 
-              : index === previousSlide 
-                ? `opacity-0 ${direction === 'next' ? 'scale-110' : 'scale-90'} z-0` 
+          className={`absolute inset-0 w-full h-full transition-all duration-1500 ease-in-out bg-cover bg-center ${index === activeSlide
+              ? 'opacity-100 scale-100 z-10'
+              : index === previousSlide
+                ? `opacity-0 ${direction === 'next' ? 'scale-110' : 'scale-90'} z-0`
                 : 'opacity-0 scale-100 z-0'
-          }`}
-          style={{ 
+            }`}
+          style={{
             backgroundImage: `url(${slide.bgImage})`,
             transitionProperty: 'opacity, transform'
           }}
         />
       ))}
-      
+
       {/* Overlay Atmosférico Aprimorado */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-20">
         <div className={`absolute inset-0 transition-opacity duration-1000 bg-black/30 backdrop-blur-sm ${animating ? 'opacity-40' : 'opacity-0'}`}></div>
       </div>
-      
+
       {/* Main Content Container */}
       <div className="absolute inset-0 z-30 flex flex-col pt-24 md:pt-28">
         <div className="flex-grow flex flex-col md:flex-row">
@@ -105,15 +104,15 @@ const PipeAgroContent = () => {
                   {slides[activeSlide].theme}
                 </span>
               </div>
-              
+
               {/* Main Title with Split Effect - Animated Transitions */}
               <div className="relative h-48 md:h-56 mb-10">
                 {slides.map((slide, index) => (
-                  <div 
+                  <div
                     key={`title-${slide.id}`}
                     className={`h-full transition-all duration-700 
-                      ${index === activeSlide 
-                        ? 'block opacity-100 transform-none' 
+                      ${index === activeSlide
+                        ? 'block opacity-100 transform-none'
                         : index === previousSlide && animating
                           ? `absolute inset-0 opacity-0 ${direction === 'next' ? '-translate-x-16' : 'translate-x-16'}`
                           : 'hidden opacity-0'
@@ -131,7 +130,7 @@ const PipeAgroContent = () => {
                         </h2>
                       )}
                     </div>
-                    
+
                     {/* Second Word */}
                     <h2 className="text-5xl md:text-7xl font-extrabold tracking-wider text-white/20 transition-transform duration-1000 delay-100">
                       {slide.subtitle}
@@ -139,15 +138,15 @@ const PipeAgroContent = () => {
                   </div>
                 ))}
               </div>
-              
+
               {/* Description with Enhanced Animation */}
               <div className="mb-12 min-h-[80px] relative">
                 {slides.map((slide, index) => (
-                  <p 
+                  <p
                     key={`desc-${slide.id}`}
                     className={`max-w-md text-gray-300 leading-relaxed transition-all duration-700 absolute 
-                      ${index === activeSlide 
-                        ? 'opacity-100 transform-none' 
+                      ${index === activeSlide
+                        ? 'opacity-100 transform-none'
                         : index === previousSlide && animating
                           ? `opacity-0 ${direction === 'next' ? 'translate-y-8' : '-translate-y-8'}`
                           : 'opacity-0 hidden'
@@ -157,11 +156,11 @@ const PipeAgroContent = () => {
                   </p>
                 ))}
               </div>
-              
+
               {/* Call to Action with Animation */}
               <div className="pt-6 transition-all duration-500">
-                <a 
-                  href="#" 
+                <a
+                  href="#"
                   className={`inline-flex items-center space-x-2 text-white group transition-all duration-500 ${animating ? 'opacity-70' : 'opacity-100'}`}
                 >
                   <span className="uppercase tracking-wider text-sm border-b border-green-400 pb-1 group-hover:text-green-400 transition-colors duration-300">Saiba Mais</span>
@@ -170,51 +169,52 @@ const PipeAgroContent = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Right Panel (Empty for Image) */}
           <div className="w-full md:w-1/2"></div>
         </div>
       </div>
-      
+
       {/* Slide Navigation Dots - Enhanced Animation */}
       <div className="absolute right-8 md:right-16 top-1/2 transform -translate-y-1/2 flex flex-col items-center space-y-6 z-30">
         {slides.map((slide, index) => (
           <button
             key={`nav-${slide.id}`}
             onClick={() => handleSlideChange(index)}
-            className={`rounded-full transition-all duration-500 ${
-              index === activeSlide 
-                ? 'w-2 h-8 bg-green-400' 
+            className={`rounded-full transition-all duration-500 ${index === activeSlide
+                ? 'w-2 h-8 bg-green-400'
                 : 'w-2 h-2 bg-white/50 hover:bg-white/80 hover:scale-150'
-            }`}
+              }`}
             aria-label={`Go to slide ${index + 1}`}
           ></button>
         ))}
       </div>
-      
+
       {/* Slide Navigation Arrows - Enhanced */}
       <div className="absolute bottom-8 md:bottom-12 right-6 md:right-16 flex space-x-4 z-30">
-        <button 
+        <button
           onClick={goToPrevSlide}
-          className={`w-10 h-10 rounded-full backdrop-blur-sm flex items-center justify-center border transition-all duration-300 
-            ${animating 
-              ? 'bg-black/20 border-white/10 scale-95' 
+          className={`w-10 h-10 cursor-pointer rounded-full backdrop-blur-sm flex items-center justify-center border transition-all duration-300 
+      ${animating
+              ? 'bg-black/20 border-white/10 scale-95'
               : 'bg-black/30 border-white/20 hover:bg-green-900/40 hover:border-green-400/40'
             }`}
         >
           <ChevronLeft className={`w-5 h-5 transition-all duration-300 ${animating ? 'text-white/70' : 'text-white'}`} />
         </button>
-        <button 
+
+        <button
           onClick={goToNextSlide}
-          className={`w-10 h-10 rounded-full backdrop-blur-sm flex items-center justify-center border transition-all duration-300 
-            ${animating 
-              ? 'bg-black/20 border-white/10 scale-95' 
+          className={`w-10 h-10 cursor-pointer rounded-full backdrop-blur-sm flex items-center justify-center border transition-all duration-300 
+      ${animating
+              ? 'bg-black/20 border-white/10 scale-95'
               : 'bg-black/30 border-white/20 hover:bg-green-900/40 hover:border-green-400/40'
             }`}
         >
           <ChevronRight className={`w-5 h-5 transition-all duration-300 ${animating ? 'text-white/70' : 'text-white'}`} />
         </button>
       </div>
+
     </div>
   );
 };
