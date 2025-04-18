@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+.banner{
+  background-image: url('./assets/african-journey.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
