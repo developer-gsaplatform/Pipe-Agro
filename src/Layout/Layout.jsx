@@ -102,6 +102,21 @@ const Layout = () => {
             Home
           </NavLink>
           <NavLink
+            to="/sobre"
+            className={({ isActive }) => {
+              const baseClasses = "text-sm uppercase tracking-widest transition-all duration-1000 px-3 py-1 rounded-md";
+
+              if (isActive) {
+                return `${baseClasses} text-white bg-green-600 font-semibold`;
+              } else {
+                return `${baseClasses} ${shouldUseWhiteText ? 'text-white/90 hover:text-green-400 hover:bg-green-900/30' : 'text-black hover:text-green-600 hover:bg-green-100/30'
+                  }`;
+              }
+            }}
+          >
+            Sobre
+          </NavLink>
+          <NavLink
             to="/produtos"
             className={({ isActive }) => {
               const baseClasses = "text-sm uppercase tracking-widest transition-all duration-1000 px-3 py-1 rounded-md";
