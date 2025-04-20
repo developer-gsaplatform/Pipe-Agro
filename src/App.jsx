@@ -6,6 +6,7 @@ import Contato from './Pages/Contato';
 import HomePage from './Pages/PipeAgroContent';
 import Produtos from './Pages/Produtos';
 import Servicos from './Pages/Servicos';
+import Sobre from './Pages/Sobre';
 
 
 const App = () => {
@@ -18,6 +19,7 @@ const App = () => {
           <Route path="/servicos" element={<Servicos/>} />
           <Route path="/galeria" element={<Galeria />} />
           <Route path="/contato" element={<Contato />} />
+          <Route path="/sobre" element={<Sobre />} />
         </Route>
       </Routes>
     </Router>
