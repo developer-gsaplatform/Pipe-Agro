@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Camera, MapPin, Leaf, X, Grid, Layers, Instagram, Download } from 'lucide-react';
+import { Search, Filter, Camera, MapPin, Leaf, X, Grid, Layers, Instagram, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import image from '../assets/fazenda.jpg';
 
 // Simulação de dados de galeria para uma empresa de agricultura em Angola
@@ -76,6 +76,69 @@ const galleryData = [
         image: image,
         featured: false
     },
+    {
+        id: 9,
+        category: 'fazendas',
+        location: 'Cunene',
+        title: 'Fazenda Sustentável',
+        description: 'Projeto modelo de agricultura sustentável com práticas de conservação de água.',
+        image: image,
+        featured: true
+    },
+    {
+        id: 10,
+        category: 'produtos',
+        location: 'Namibe',
+        title: 'Frutas Tropicais',
+        description: 'Produção de frutas tropicais orgânicas para mercado local e exportação.',
+        image: image,
+        featured: false
+    },
+    {
+        id: 11,
+        category: 'tecnologia',
+        location: 'Cabinda',
+        title: 'Monitoramento de Solo',
+        description: 'Sistema inteligente de monitoramento da qualidade do solo e umidade.',
+        image: image,
+        featured: false
+    },
+    {
+        id: 12,
+        category: 'fazendas',
+        location: 'Lunda Norte',
+        title: 'Produção de Soja',
+        description: 'Cultivo de soja com técnicas inovadoras para maior produtividade.',
+        image: image,
+        featured: true
+    },
+    {
+        id: 13,
+        category: 'produtos',
+        location: 'Moxico',
+        title: 'Mel Silvestre',
+        description: 'Produção de mel orgânico a partir de apiários em áreas de preservação.',
+        image: image,
+        featured: false
+    },
+    {
+        id: 14,
+        category: 'tecnologia',
+        location: 'Bengo',
+        title: 'Energia Solar para Irrigação',
+        description: 'Sistemas de bombeamento de água com energia solar para áreas rurais.',
+        image: image,
+        featured: true
+    },
+    {
+        id: 15,
+        category: 'fazendas',
+        location: 'Cuanza Sul',
+        title: 'Rotação de Culturas',
+        description: 'Implementação de técnicas de rotação para recuperação de solos degradados.',
+        image: image,
+        featured: false
+    },
 ];
 
 const Galeria = () => {
@@ -85,6 +148,11 @@ const Galeria = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [viewMode, setViewMode] = useState('grid'); // 'grid' ou 'masonry'
+    
+    // Estados para paginação
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(6);
+    const [totalPages, setTotalPages] = useState(1);
 
     // Agrupar categorias únicas
     const categories = ['todos', ...new Set(galleryData.map(item => item.category))];
@@ -100,7 +168,13 @@ const Galeria = () => {
         });
 
         setFilteredItems(filtered);
-    }, [filter, searchTerm]);
+        
+        // Calcular total de páginas quando os filtros mudam
+        setTotalPages(Math.ceil(filtered.length / itemsPerPage));
+        
+        // Voltar para a primeira página quando os filtros mudam
+        setCurrentPage(1);
+    }, [filter, searchTerm, itemsPerPage]);
 
     // Abrir modal com detalhes do item
     const openModal = (item) => {
@@ -115,15 +189,38 @@ const Galeria = () => {
         document.body.style.overflow = 'auto';
     };
 
+    // Mudar a página
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        // Rolagem para o topo da galeria
+        window.scrollTo({ top: document.getElementById('galeria-top').offsetTop - 100, behavior: 'smooth' });
+    };
+
+    // Ir para a página anterior
+    const goToPreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(prev => prev - 1);
+            window.scrollTo({ top: document.getElementById('galeria-top').offsetTop - 100, behavior: 'smooth' });
+        }
+    };
+
+    // Ir para a próxima página
+    const goToNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(prev => prev + 1);
+            window.scrollTo({ top: document.getElementById('galeria-top').offsetTop - 100, behavior: 'smooth' });
+        }
+    };
+
     // Organizar itens para o layout masonry
-    const organizeItemsForMasonry = () => {
+    const organizeItemsForMasonry = (itemsToOrganize) => {
         const columns = {
             col1: [],
             col2: [],
             col3: []
         };
 
-        filteredItems.forEach((item, index) => {
+        itemsToOrganize.forEach((item, index) => {
             if (index % 3 === 0) columns.col1.push(item);
             else if (index % 3 === 1) columns.col2.push(item);
             else columns.col3.push(item);
@@ -132,10 +229,105 @@ const Galeria = () => {
         return columns;
     };
 
-    const masonryColumns = organizeItemsForMasonry();
+    // Obter os itens atuais com base na página
+    const getCurrentItems = () => {
+        const indexOfLastItem = currentPage * itemsPerPage;
+        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+        return filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+    };
+
+    const currentItems = getCurrentItems();
+    const masonryColumns = organizeItemsForMasonry(currentItems);
+
+    // Gerar botões de paginação
+    const renderPaginationButtons = () => {
+        const buttons = [];
+        const maxButtonsToShow = 5; // Número máximo de botões de página para mostrar
+        
+        // Cálculo para decidir quais botões mostrar
+        let startPage, endPage;
+        
+        if (totalPages <= maxButtonsToShow) {
+            // Se temos menos páginas que o máximo de botões, mostramos todas
+            startPage = 1;
+            endPage = totalPages;
+        } else {
+            // Calculamos um intervalo centralizado na página atual
+            const halfWay = Math.floor(maxButtonsToShow / 2);
+            
+            if (currentPage <= halfWay + 1) {
+                startPage = 1;
+                endPage = maxButtonsToShow;
+            } else if (currentPage >= totalPages - halfWay) {
+                startPage = totalPages - maxButtonsToShow + 1;
+                endPage = totalPages;
+            } else {
+                startPage = currentPage - halfWay;
+                endPage = currentPage + halfWay;
+            }
+        }
+        
+        // Adiciona botão para a primeira página se não estiver no intervalo
+        if (startPage > 1) {
+            buttons.push(
+                <button 
+                    key={1}
+                    onClick={() => handlePageChange(1)}
+                    className={`w-10 h-10 rounded-md flex items-center justify-center transition-colors border ${currentPage === 1 ? 'bg-green-500 text-white border-green-500' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
+                >
+                    1
+                </button>
+            );
+            
+            // Adiciona reticências se necessário
+            if (startPage > 2) {
+                buttons.push(
+                    <span key="ellipsis1" className="w-10 h-10 flex items-center justify-center">
+                        ...
+                    </span>
+                );
+            }
+        }
+        
+        // Adiciona os botões numerados
+        for (let i = startPage; i <= endPage; i++) {
+            buttons.push(
+                <button 
+                    key={i}
+                    onClick={() => handlePageChange(i)}
+                    className={`w-10 h-10 rounded-md flex items-center justify-center transition-colors border ${currentPage === i ? 'bg-green-500 text-white border-green-500' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
+                >
+                    {i}
+                </button>
+            );
+        }
+        
+        // Adiciona reticências e último botão se necessário
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                buttons.push(
+                    <span key="ellipsis2" className="w-10 h-10 flex items-center justify-center">
+                        ...
+                    </span>
+                );
+            }
+            
+            buttons.push(
+                <button 
+                    key={totalPages}
+                    onClick={() => handlePageChange(totalPages)}
+                    className={`w-10 h-10 rounded-md flex items-center justify-center transition-colors border ${currentPage === totalPages ? 'bg-green-500 text-white border-green-500' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
+                >
+                    {totalPages}
+                </button>
+            );
+        }
+        
+        return buttons;
+    };
 
     return (
-        <div className="pt-24 md:pt-28 pb-16 px-4 md:px-8 lg:px-16 min-h-screen bg-gradient-to-b from-white to-green-50">
+        <div id="galeria-top" className="pt-24 md:pt-28 pb-16 px-4 md:px-8 lg:px-16 min-h-screen bg-gradient-to-b from-white to-green-50">
             {/* Título da seção com decoração */}
             <div className="mb-12 text-center relative">
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -z-10 text-green-100 opacity-30">
@@ -220,13 +412,35 @@ const Galeria = () => {
                 </div>
             </div>
 
+            {/* Contador de resultados e seletor de itens por página */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                <div className="text-gray-600 mb-4 sm:mb-0">
+                    Mostrando <span className="font-medium">{Math.min(filteredItems.length, currentItems.length)}</span> de <span className="font-medium">{filteredItems.length}</span> itens
+                </div>
+                
+                <div className="flex items-center">
+                    <label htmlFor="itemsPerPage" className="text-gray-600 mr-3 text-sm">Itens por página:</label>
+                    <select
+                        id="itemsPerPage"
+                        value={itemsPerPage}
+                        onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                        className="bg-white border border-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
+                    >
+                        <option value={3}>3</option>
+                        <option value={6}>6</option>
+                        <option value={9}>9</option>
+                        <option value={12}>12</option>
+                    </select>
+                </div>
+            </div>
+
             {/* Grid de galeria - Modo de visualização responsivo */}
             {filteredItems.length > 0 ? (
                 <>
                     {/* Modo Grid */}
                     {viewMode === 'grid' && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {filteredItems.map(item => (
+                            {currentItems.map(item => (
                                 <div
                                     key={item.id}
                                     className="group relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer"
@@ -383,6 +597,34 @@ const Galeria = () => {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+                    )}
+                    
+                    {/* Sistema de Paginação */}
+                    {totalPages > 1 && (
+                        <div className="mt-10 flex justify-center">
+                            <div className="flex items-center gap-2">
+                                {/* Botão Anterior */}
+                                <button 
+                                    onClick={goToPreviousPage}
+                                    className={`w-10 h-10 rounded-md flex items-center justify-center border ${currentPage === 1 ? 'text-gray-300 border-gray-200 cursor-not-allowed' : 'text-gray-600 border-gray-200 hover:bg-gray-50'}`}
+                                    disabled={currentPage === 1}
+                                >
+                                    <ChevronLeft className="w-5 h-5" />
+                                </button>
+                                
+                                {/* Números das Páginas */}
+                                {renderPaginationButtons()}
+                                
+                                {/* Botão Próximo */}
+                                <button 
+                                    onClick={goToNextPage}
+                                    className={`w-10 h-10 rounded-md flex items-center justify-center border ${currentPage === totalPages ? 'text-gray-300 border-gray-200 cursor-not-allowed' : 'text-gray-600 border-gray-200 hover:bg-gray-50'}`}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    <ChevronRight className="w-5 h-5" />
+                                </button>
                             </div>
                         </div>
                     )}
